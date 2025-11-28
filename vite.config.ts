@@ -15,5 +15,5 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: mode === 'production' ? './' : '/tuso-demo/',
+  base: mode === 'production' ? './' : '/tuso-demo-web/',
 }));
