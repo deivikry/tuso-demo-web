@@ -10,7 +10,7 @@
   import { Compass, Mail, Lock, User } from "lucide-react";
   import { loginUser,registerUser  } from "@/lib/api"; //  conexión con el backend
 
-  const Login = () => {
+  /*const Login = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
@@ -85,7 +85,50 @@
     setIsLoading(false);
   }
 };
+*/
 
+const Login = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      localStorage.setItem("tuso_user", JSON.stringify({ 
+        nombre: "Usuario Demo", 
+        puntos: 0,
+        destinos_visitados: [] 
+      }));
+      toast({
+        title: "¡Bienvenido a TUSO!",
+        description: "Tu aventura comienza ahora",
+      });
+      navigate("/discover");
+      setIsLoading(false);
+    }, 800);
+  };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      localStorage.setItem("tuso_user", JSON.stringify({ 
+        nombre: "Usuario Demo", 
+        puntos: 0,
+        destinos_visitados: [] 
+      }));
+      toast({
+        title: "¡Cuenta creada!",
+        description: "Comienza a descubrir Ibagué",
+      });
+      navigate("/discover");
+      setIsLoading(false);
+    }, 800);
+  };
 
 
 
