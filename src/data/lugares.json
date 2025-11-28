@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "nombre": "Parque de la Música",
+    "descripcion": "Espacio cultural emblemático de Ibagué, perfecto para disfrutar de eventos artísticos y música en vivo rodeado de naturaleza.",
+    "tipo": "cultural",
+    "presupuesto": "bajo",
+    "distancia": 2,
+    "puntos": 10,
+    "imagen": "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&q=80"
+  },
+  {
+    "id": 2,
+    "nombre": "Cañón del Combeima",
+    "descripcion": "Impresionante cañón natural ideal para ecoturismo, con ríos cristalinos, cascadas y paisajes de montaña espectaculares.",
+    "tipo": "naturaleza",
+    "presupuesto": "medio",
+    "distancia": 12,
+    "puntos": 20,
+    "imagen": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80"
+  },
+  {
+    "id": 3,
+    "nombre": "Jardín Botánico San Jorge",
+    "descripcion": "Oasis verde en el centro de la ciudad con colecciones de plantas nativas y exóticas. Perfecto para una tarde tranquila.",
+    "tipo": "naturaleza",
+    "presupuesto": "bajo",
+    "distancia": 3,
+    "puntos": 10,
+    "imagen": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&q=80"
+  },
+  {
+    "id": 4,
+    "nombre": "Conservatorio del Tolima",
+    "descripcion": "Institución musical reconocida nacionalmente. Ofrece conciertos gratuitos y visitas guiadas para conocer su historia.",
+    "tipo": "cultural",
+    "presupuesto": "bajo",
+    "distancia": 1,
+    "puntos": 15,
+    "imagen": "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=800&q=80"
+  },
+  {
+    "id": 5,
+    "nombre": "Nevado del Tolima",
+    "descripcion": "Desafío para aventureros: ascenso al nevado con paisajes únicos y experiencia inolvidable en alta montaña.",
+    "tipo": "aventura",
+    "presupuesto": "alto",
+    "distancia": 45,
+    "puntos": 50,
+    "imagen": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80"
+  },
+  {
+    "id": 6,
+    "nombre": "Mercado La 21",
+    "descripcion": "Mercado tradicional donde degustar comida típica tolimense, lechona, tamales y jugos naturales.",
+    "tipo": "gastronomia",
+    "presupuesto": "bajo",
+    "distancia": 2,
+    "puntos": 10,
+    "imagen": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80"
+  },
+  {
+    "id": 7,
+    "nombre": "Laguna de San Ignacio",
+    "descripcion": "Laguna natural rodeada de bosque andino, ideal para picnic, senderismo y avistamiento de aves.",
+    "tipo": "naturaleza",
+    "presupuesto": "medio",
+    "distancia": 18,
+    "puntos": 25,
+    "imagen": "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80"
+  },
+  {
+    "id": 8,
+    "nombre": "Museo de Arte del Tolima",
+    "descripcion": "Exposiciones de arte contempor��neo y tradicional. Un espacio cultural imperdible en el corazón de Ibagué.",
+    "tipo": "cultural",
+    "presupuesto": "bajo",
+    "distancia": 1,
+    "puntos": 10,
+    "imagen": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=800&q=80"
+  }
+]
