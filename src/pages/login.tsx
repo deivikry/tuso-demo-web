@@ -7,12 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Compass, Mail, Lock, User } from "lucide-react";
-// import { loginUser, registerUser } from "@/lib/api"; // 🔒 Comentado temporalmente para deployment sin backend
+import { loginUser, registerUser } from "@/lib/api/auth";
+import { useApi } from "@/hooks/useApi";
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
 
   // Estados para guardar lo que escribe el usuario
   const [email, setEmail] = useState("");
@@ -21,20 +21,19 @@ const Login = () => {
   const [registerPassword, setRegisterPassword] = useState("");
   const [name, setName] = useState("");
 
-  // ==========================================
-  // 🔒 VERSIÓN CON BACKEND (COMENTADA)
-  // ==========================================
-  // Descomenta este código cuando tengas el backend listo
+  // Hook personalizado para manejar el login
+  const { loading: loginLoading, execute: executeLogin } = useApi(loginUser);
 
-  /*
-  //  Login real con conexión al backend
+  // Hook personalizado para manejar el registro
+  const { loading: registerLoading, execute: executeRegister } = useApi(registerUser);
+
+
+  // Login con backend usando useApi hook
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
     try {
-      // Enviamos los datos al backend
-      const response = await loginUser(email, password);
+      const response = await executeLogin(email, password);
 
       // Guardamos token y usuario en localStorage
       localStorage.setItem("auth_token", response.token);
@@ -42,33 +41,27 @@ const Login = () => {
 
       toast({
         title: "¡Bienvenido a TUSO!",
-        description: "Tu aventura comienza ahora",
+        description: `Hola ${response.user.nombre}, tu aventura comienza ahora`,
       });
 
-      navigate("/discover"); // Redirige al home o dashboard
-    } catch (error) {
+      navigate("/discover");
+    } catch (error: any) {
       toast({
         title: "Error al iniciar sesión",
-        description: "Correo o contraseña incorrectos",
+        description: error.response?.data?.error || "Correo o contraseña incorrectos",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
-  */
 
-  /*
-  // 🧾 Registro real con conexión al backend
+  // Registro con backend usando useApi hook
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
     try {
-      // 👇 Llamamos al backend usando la función de /lib/api.ts
-      const response = await registerUser(name, registerEmail, registerPassword);
+      const response = await executeRegister(name, registerEmail, registerPassword);
 
-      // Guardamos token y usuario (como hace el login)
+      // Guardamos token y usuario
       localStorage.setItem("auth_token", response.token);
       localStorage.setItem("tuso_user", JSON.stringify(response.user));
 
@@ -77,130 +70,16 @@ const Login = () => {
         description: `Bienvenido ${response.user.nombre}, comienza a descubrir Ibagué.`,
       });
 
-      // Redirigimos a la página principal
       navigate("/discover");
     } catch (error: any) {
       toast({
         title: "Error al registrar",
-        description: error.response?.data?.message || "No se pudo crear la cuenta",
+        description: error.response?.data?.error || "No se pudo crear la cuenta",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  */
-
-  // ==========================================
-  // ✅ VERSIÓN SIN BACKEND (TEMPORAL)
-  // ==========================================
-  // Elimina o comenta este código cuando conectes el backend
-
-  // Login sin backend - acepta cualquier credencial
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Simulamos un delay de red
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    try {
-      // Validación básica
-      if (!email || !password) {
-        toast({
-          title: "Campos incompletos",
-          description: "Por favor completa todos los campos",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Creamos un usuario simulado
-      const mockUser = {
-        id: "demo-user-001",
-        nombre: email.split("@")[0], // Usamos la parte antes del @ como nombre
-        email: email,
-        avatar: null,
-      };
-
-      const mockToken = "demo-token-" + Date.now();
-
-      // Guardamos en localStorage (igual que con backend)
-      localStorage.setItem("auth_token", mockToken);
-      localStorage.setItem("tuso_user", JSON.stringify(mockUser));
-
-      toast({
-        title: "¡Bienvenido a TUSO!",
-        description: "Tu aventura comienza ahora",
-      });
-
-      navigate("/discover");
-    } catch (error) {
-      toast({
-        title: "Error inesperado",
-        description: "Por favor intenta nuevamente",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  // Registro sin backend - acepta cualquier dato
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Simulamos un delay de red
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    try {
-      // Validación básica
-      if (!name || !registerEmail || !registerPassword) {
-        toast({
-          title: "Campos incompletos",
-          description: "Por favor completa todos los campos",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Creamos un usuario simulado
-      const mockUser = {
-        id: "demo-user-" + Date.now(),
-        nombre: name,
-        email: registerEmail,
-        avatar: null,
-      };
-
-      const mockToken = "demo-token-" + Date.now();
-
-      // Guardamos en localStorage
-      localStorage.setItem("auth_token", mockToken);
-      localStorage.setItem("tuso_user", JSON.stringify(mockUser));
-
-      toast({
-        title: "¡Cuenta creada con éxito!",
-        description: `Bienvenido ${name}, comienza a descubrir Ibagué.`,
-      });
-
-      navigate("/discover");
-    } catch (error) {
-      toast({
-        title: "Error inesperado",
-        description: "Por favor intenta nuevamente",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ==========================================
-  // FIN DE VERSIONES
-  // ==========================================
 
   return (
     <div className="min-h-screen bg-muted flex items-center justify-center p-4">
@@ -260,8 +139,8 @@ const Login = () => {
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Ingresando..." : "Ingresar"}
+                  <Button type="submit" className="w-full" disabled={loginLoading}>
+                    {loginLoading ? "Ingresando..." : "Ingresar"}
                   </Button>
                 </form>
               </TabsContent>
@@ -317,8 +196,8 @@ const Login = () => {
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Creando cuenta..." : "Crear cuenta"}
+                  <Button type="submit" className="w-full" disabled={registerLoading}>
+                    {registerLoading ? "Creando cuenta..." : "Crear cuenta"}
                   </Button>
                 </form>
               </TabsContent>
