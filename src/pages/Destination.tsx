@@ -6,6 +6,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { X, Check, MapPin, Wallet, Trophy } from "lucide-react";
 import lugaresData from "@/data/lugares.json";
+import { useApi } from "@/hooks/useApi";
+import { visitDestination } from "@/lib/api/destinations";
 
 interface Lugar {
   id: number;
@@ -25,6 +27,9 @@ const Destination = () => {
   const [lugar, setLugar] = useState<Lugar | null>(null);
   const [showButtons, setShowButtons] = useState(true);
 
+  // Hook para marcar destino como visitado
+  const { loading: accepting, execute: executeVisit } = useApi(visitDestination);
+
   useEffect(() => {
     const tipo = searchParams.get("tipo") || "naturaleza";
     const presupuesto = searchParams.get("presupuesto") || "medio";
@@ -39,8 +44,8 @@ const Destination = () => {
     );
 
     // Si no hay lugares compatibles, mostrar cualquiera del tipo seleccionado
-    const lugaresDelTipo = lugaresCompatibles.length > 0 
-      ? lugaresCompatibles 
+    const lugaresDelTipo = lugaresCompatibles.length > 0
+      ? lugaresCompatibles
       : (lugaresData as Lugar[]).filter((l) => l.tipo === tipo);
 
     // Seleccionar uno aleatorio
@@ -59,26 +64,42 @@ const Destination = () => {
     navigate("/discover");
   };
 
-  const handleAceptar = () => {
+  const handleAceptar = async () => {
     if (!lugar) return;
 
     setShowButtons(false);
-    
-    // Actualizar puntos del usuario
-    const userData = JSON.parse(localStorage.getItem("tuso_user") || "{}");
-    userData.puntos = (userData.puntos || 0) + lugar.puntos;
-    userData.destinos_visitados = [...(userData.destinos_visitados || []), lugar.id];
-    localStorage.setItem("tuso_user", JSON.stringify(userData));
 
-    toast({
-      title: `¡Has ganado ${lugar.puntos} puntos! 🎉`,
-      description: `Total de puntos: ${userData.puntos}`,
-      duration: 4000,
-    });
+    try {
+      // Llamar al backend para registrar la visita
+      const result = await executeVisit(lugar.id);
 
-    setTimeout(() => {
-      navigate("/profile");
-    }, 2000);
+      // Actualizar localStorage con la respuesta del backend
+      const userData = JSON.parse(localStorage.getItem("tuso_user") || "{}");
+      userData.puntos = result.nuevo_total;
+      userData.nivel_actual = result.nuevo_nivel;
+      userData.destinos_visitados = [...(userData.destinos_visitados || []), lugar.id];
+      localStorage.setItem("tuso_user", JSON.stringify(userData));
+
+      toast({
+        title: `¡Has ganado ${result.puntos_ganados} puntos! 🎉`,
+        description: `Nivel actual: ${result.nuevo_nivel} - Total: ${result.nuevo_total} puntos`,
+        duration: 4000,
+      });
+
+      setTimeout(() => {
+        navigate("/profile");
+      }, 2000);
+
+    } catch (error: any) {
+      // Restaurar botones si hay error
+      setShowButtons(true);
+
+      toast({
+        title: "Error al registrar visita",
+        description: error.response?.data?.error || "No se pudo registrar la visita. Intenta nuevamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!lugar) {
@@ -144,9 +165,10 @@ const Destination = () => {
                   size="lg"
                   onClick={handleAceptar}
                   className="h-14 bg-primary hover:bg-primary/90"
+                  disabled={accepting}
                 >
                   <Check className="w-5 h-5 mr-2" />
-                  Aceptar
+                  {accepting ? "Registrando..." : "Aceptar"}
                 </Button>
               </div>
             )}

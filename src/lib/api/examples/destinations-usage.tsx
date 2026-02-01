@@ -5,6 +5,7 @@
  * con el hook useApi para manejar estados de carga y errores.
  */
 
+import { useToast } from "@/hooks/use-toast";
 import { useApi } from "@/hooks/useApi";
 import {
     getAllDestinations,
@@ -13,6 +14,7 @@ import {
     visitDestination,
     type Destination
 } from "@/lib/api/destinations";
+import { useEffect } from "react";
 
 // ========== EJEMPLO 1: Listar todos los destinos ==========
 export function DestinationsList() {
