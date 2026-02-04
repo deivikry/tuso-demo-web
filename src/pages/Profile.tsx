@@ -9,6 +9,17 @@ import { useApi } from "@/hooks/useApi";
 import { getAllDestinations, visitDestination, type Destination } from "@/lib/api/destinations";
 import { fetchUserProfile } from "@/lib/api/user";
 import { useToast } from "@/hooks/use-toast";
+import { useDestinationStats } from "@/hooks/useDestinationStats"; // [NEW] Import hook
+
+// Interface definitions for better type safety
+interface ApiError {
+  response?: {
+    data?: {
+      error?: string;
+    };
+  };
+  message?: string;
+}
 
 interface UserProfile {
   user: {
@@ -25,6 +36,17 @@ interface UserProfile {
   historial: (Destination & { visit_date: string })[];
 }
 
+/**
+ * Componente Profile
+ * 
+ * Muestra el perfil del usuario, incluyendo:
+ * - Estadísticas generales (nivel, puntos).
+ * - Barra de progreso hacia el siguiente nivel.
+ * - Lista de destinos disponibles para visitar (o re-visitar).
+ * - Historial de lugares ya visitados.
+ * 
+ * @returns {JSX.Element} La página de perfil renderizada.
+ */
 const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -60,6 +82,12 @@ const Profile = () => {
     navigate("/discover");
   };
 
+  /**
+   * Maneja la acción de visitar un destino.
+   * Llama a la API y actualiza el estado local tras el éxito.
+   * 
+   * @param {number} destinationId - El ID del destino a visitar.
+   */
   const handleVisitDestination = async (destinationId: number) => {
     try {
       const result = await executeVisit(destinationId);
@@ -72,10 +100,13 @@ const Profile = () => {
       // Reload profile to update stats and history
       loadProfile();
 
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as ApiError;
+      const errorMessage = err.response?.data?.error || err.message || "No se pudo registrar la visita";
+
       toast({
         title: "Error",
-        description: error.response?.data?.error || "No se pudo registrar la visita",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -91,28 +122,11 @@ const Profile = () => {
 
   const { user, stats, historial } = profileData as UserProfile;
 
-  // Process history to count visits per destination
-  const visitsCount = historial.reduce((acc, visit) => {
-    acc[visit.id] = (acc[visit.id] || 0) + 1;
-    return acc;
-  }, {} as Record<number, number>);
-
-  // Get IDs of visited places
-  const visitedIds = Object.keys(visitsCount).map(Number);
-
-  // Filter available places (those NOT in visitedIds, or maybe ALL are available to revisit?)
-  // User asked to allow visiting multiple times. So we can show ALL in "Available" or just new ones?
-  // Let's show "Destinos para descubrir" (New) and "Destinos Favoritos" (Visited)
-  // Or just list them all.
-  // Implementation: "Available to visit" = All destinations (since you can revisit).
-  // But to keep UI clean, maybe show "Explorar Nuevos" and "Volver a visitar".
-
-  // For now: Available = Not visited yet.
-  const newPlaces = destinationsData?.destinos.filter(d => !visitedIds.includes(d.id)) || [];
-
-  // Group visited places for display (unique list)
-  const uniqueVisitedPlaces = Array.from(new Set(historial.map(v => v.id)))
-    .map(id => historial.find(v => v.id === id)!);
+  // [REFACTOR] Use custom hook for logic separation
+  const { visitsCount, newPlaces, uniqueVisitedPlaces } = useDestinationStats(
+    historial,
+    destinationsData?.destinos || []
+  );
 
   return (
     <div className="min-h-screen bg-muted">
